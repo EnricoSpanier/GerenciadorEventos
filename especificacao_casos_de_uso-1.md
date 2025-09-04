@@ -1,7 +1,5 @@
 # Casos de uso
 
-*Gerado em: 2025-09-04*
-
 <img width="680" height="420" alt="D_Organizaê drawio" src="https://github.com/user-attachments/assets/38891b5f-f6df-4d41-b917-a5eac20f1a9c" />
 
 # Especificação dos Casos de Uso — App Organizador de Eventos "Organizaê"
