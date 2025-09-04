@@ -46,12 +46,12 @@
 |  | 4. Sistema exibe mensagem de confirmação de participação |
 |  |5. Sistema registra a participação do usuário no evento |     
 | **Fluxo Alternativo**  | --- | 
-|  | 2a. Sistema redireciona para tela de login |   
-| 3a. Participante insere suas credenciais | |  
-|  | 4a. Sistema valida as credenciais com o banco de dados |
-|  | 5a. Sistema registra a partcipação do usuário no evento|
+| | 1a. Sistema identifica que não a login na sessão |
+| | 2a. Sistema redireciona para tela de login |
+| 3a. Organizador insere suas credenciais | |
+| | 4a. Sistema valida as credenciais com o banco de dados |
 | **Fluxo de Exceção** | ---  | 
-|  | 4a. Sistema exibe mensagem de erro no login e solicita nova tentativa | 
+|  | 4b. Sistema exibe mensagem de erro no login e solicita nova tentativa | 
 | **Restrições e Validações** | 1. Apenas usuários autenticados podem participar de eventos | 
 |  | 2. O sistema deve impedir participação duplicada no mesmo evento |
 
@@ -72,11 +72,11 @@
 | 4. Participante cofirma o cancelamento da participação | |
 | |5. Sistema remove a participação do usuário no evento |
 | | 6. Sistema exibe mensagem de confirmação de cancelamento |
-| **Fluxo Alternativo** | --- | 
+| **Fluxo Alternativo** | --- |
+| | 1a. Sistema identifica que não a login na sessão |
 | | 2a. Sistema redireciona para tela de login |
-| 3a. Participante insere suas credenciais | |
-| | 4a. Sistema valida as credenciais com o banco de dados | 
-| | 5a. Sistema cancela a participação do usuário no evento |
+| 3a. Organizador insere suas credenciais | |
+| | 4a. Sistema valida as credenciais com o banco de dados |
 | **Fluxo de Exceção** | --- |
 | | 4b. Credenciais invalidas |
 | | 5b.  Sistema exibe mensagem de erro no login e solicita nova tentativa | 
