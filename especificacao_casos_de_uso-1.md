@@ -36,11 +36,11 @@
 | **Ator Principal** | Participante| 
 | **Ator Secundário**  | Banco de Dados | 
 | **Resumo** | Esse caso de uso descreve as etapas percorridas onde o participante confirma sua participação em um evento | 
-| **Pré-Condição**| O usuário deve estar logado no sistema| 
+| **Pré-Condição**| O usuário deve estar logado no sistema <br> O sistema deve estar na página do evento| 
 | **Pós-Condição**| A participação do usuário ao evento é registrada no sistema | 
 | **Fluxo Principal**  | ---  | 
 | **Ações do Ator** | **Ações do Sistema** | 
-| 1. Participante seleciona a opção "Participar" no evento|   |
+| 1. Participante seleciona a opção "Participar" do evento|   |
 |  | 2. Sistema requisita a confirmação da participação do usuário no evento |
 | 3. Participante cofirma a participação   | |      
 |  | 4. Sistema exibe mensagem de confirmação de participação |
@@ -48,10 +48,11 @@
 | **Fluxo Alternativo**  | --- | 
 |  | 2a. Sistema redireciona para tela de login |   
 | 3a. Participante insere suas credenciais | |  
-|  | 4a. Sistema valida as credenciais com o banco de dados | 
+|  | 4a. Sistema valida as credenciais com o banco de dados |
+|  | 5a. Sistema registra a partcipação do usuário no evento|
 | **Fluxo de Exceção** | ---  | 
 |  | 4a. Sistema exibe mensagem de erro no login e solicita nova tentativa | 
-| **Restrições e Validações** | 1. Apenas participantes autenticados podem participar de eventos | 
+| **Restrições e Validações** | 1. Apenas usuários autenticados podem participar de eventos | 
 |  | 2. O sistema deve impedir participação duplicada no mesmo evento |
 
 ---
@@ -61,7 +62,7 @@
 | **Ator Principal** | Participante |
 | **Ator Secundário** | Banco de Dados |
 | **Resumo** | Esse caso de uso descreve as etapas percorridas onde o participante cancela sua participação previamente registrada em um evento |
-| **Pré-Condição** | O usuário deve estar logado no sistema e já ter confirmado sua participação nesse evento |
+| **Pré-Condição** | O usuário deve estar logado no sistema <br> O usuário deve ser participante no evento |
 | **Pós-Condição** | A participação do usuário no evento é cancelada do sistema |
 | **Fluxo Principal** | --- |
 | **Ações do Ator** | **Ações do Sistema** |
@@ -75,15 +76,16 @@
 | | 2a. Sistema redireciona para tela de login |
 | 3a. Participante insere suas credenciais | |
 | | 4a. Sistema valida as credenciais com o banco de dados | 
+| | 5a. Sistema cancela a participação do usuário no evento |
 | **Fluxo de Exceção** | --- |
-| | 4a. Credenciais invalidas |
-| | 5a.  Sistema exibe mensagem de erro no login e solicita nova tentativa | 
+| | 4b. Credenciais invalidas |
+| | 5b.  Sistema exibe mensagem de erro no login e solicita nova tentativa | 
 | **Fluxo de Exceção** | --- |
-| | 2b. Participante não está participando do evento 
-| | 3b. Sistema exibe mensagem informando que não há participação registrada |
+| | 2c. Participante não está participando do evento 
+| | 3c. Sistema exibe mensagem informando que não há participação registrada |
 | **Fluxo de Exceção** | --- |
-| | 5c. Falha ao cancelar participação | 
-| | 6c. Sistema exibe erro e sugere tentar novamente mais tarde |
+| | 5d. Falha ao cancelar participação | 
+| | 6d. Sistema exibe erro e sugere tentar novamente mais tarde |
 | **Restrições e Validações** | 1. Apenas usuários autenticados podem cancelar participação | 
 | | 2. Cancelamento só é possível se houver uma participação registrada previamente |
 
@@ -95,27 +97,23 @@
 | ***Ator Secundário*** | Banco de Dados |
 | ***Resumo*** | Esse caso de uso descreve as etapas percorridas para  criar novos eventos |
 | ***Pré-Condição*** | Estar logado no sistema Organizaê |
-| ***Pós Condição*** |  |
+| ***Pós Condição*** | Evento cadastrado no sistema |
 | **Fluxo Principal** |  |
 | ***Ações do Ator*** | ***Ações do Sistema*** |
 | 1. Organizador entra no Organizaê |  |
-|  | 2. exibe menu de opções |
-| 3. Organizador seleciona opção de criar evento |
-| | 4. Sistema redireciona para tela de login |
-| 5. Participante insere suas credenciais | |
-| | 6. Sistema valida as credenciais com o banco de dados | 
-|  | 7. Sistema exibe a tela de criação de eventos na qual irá solicitar as informações do evento |
-| 8. Usuário insere todas as informações nescessárias para o evento |  |
-|  | 9. Sistema atualiza a lista de eventos e volta para a tela do menu de opões |
-| 10. Organizador faz Logout ou seleciona uma opção nova | |
-|  | 11. Sistema exibe tela de opções ou fecha |
+| 2. Organizador seleciona opção de criar evento | 
+|  | 3. Sistema exibe a tela de criação de eventos na qual irá solicitar as informações do evento |
+| 4. Usuário insere todas as informações nescessárias para o evento |  |
+|  | 5. Sistema atualiza a lista de eventos e volta para a home page |
 | **Fluxo Alternativo** | --- |
-| 1. | |
-|  | 2. |
+| | 3a. Sistema identifica que não a login na sessão |
+| | 4a. Sistema redireciona para tela de login |
+| 5a. Organizador insere suas credenciais | |
+| | 6a. Sistema valida as credenciais com o banco de dados |
 | **Fluxo de Exceção** | --- |
-| 1. | |
+| 1. |  |
 |  | 2. |
-| **Restrições e Validações:** | 1. Apenas participantes autenticados podem criar eventos  |
+| **Restrições e Validações:** | 1. Apenas usuários autenticados podem criar eventos  |
 
 ---
 
@@ -129,25 +127,23 @@
 | **Fluxo Principal** |  |
 | ***Ações do Ator*** | ***Ações do Sistema*** |
 | 1. Organizador entra no Organizaê |  |
-|  | 2. exibe menu de opções |
-| 3. Organizador seleciona opção de gerenciar evento |
-| | 4. Sistema redireciona para tela de login |
-| 5. Participante insere suas credenciais | |
-| | 6. Sistema valida as credenciais com o banco de dados | 
-|  | 7. Sistema exibe todos os eventos do Organizador |
-| 8. Organizador seleciona o evento desejado |  |
-|  | 9. Sistema exibe as informações sobre o evento selecionado e permite alterações |
-| 10. Organizador altera informações desejadas e salva as novas | |
-|  | 11. Sistema atualiza a lista de eventos e volta para a tela do menu de opões |
-| 12. Organizador faz Logout ou seleciona uma opção nova | |
-|  | 13. Sistema exibe tela de opções ou fecha |
+| 2. Organizador seleciona opção meus eventos |
+|  | 3. Sistema exibe todos os eventos do Organizador |
+| 4. Organizador seleciona o evento desejado |  |
+|  | 5. Sistema exibe as informações sobre o evento selecionado e permite alterações |
+| 6. Organizador altera informações desejadas e salva as novas | |
+|  | 7. Sistema atualiza a lista de eventos e volta para a home page |
 | **Fluxo Alternativo** | --- |
-| 10a. Organizador opta por excluir o evento | |
-| | 11a. Sistema requisita a confirmação da exclusão do evento |
-| 12a. Organizador cofirma a exclusão | |
-| |13a. Sistema remove o evento da lista de eventos |
+| | 2a. Sistema identifica que não há login na sessão |
+| | 3a.. Sistema redireciona para tela de login |
+| 4a. Participante insere suas credenciais | |
+| | 5a. Sistema valida as credenciais com o banco de dados | 
+| 6b. Organizador opta por excluir o evento | |
+| | 7b. Sistema requisita a confirmação da exclusão do evento |
+| 8b. Organizador cofirma a exclusão | |
+| |9b. Sistema remove o evento da lista de eventos |
 | **Fluxo de Exceção** | --- |
 | 1. | |
 |  | 2. |
-| **Restrições e Validações:** | 1. Apenas organizadores autenticados podem criar eventos  |
+| **Restrições e Validações:** | 1. Apenas organizadores autenticados podem editar eventos  |
 | | 2. Apenas o organizador que criou o evento pode gerencia-lo |
