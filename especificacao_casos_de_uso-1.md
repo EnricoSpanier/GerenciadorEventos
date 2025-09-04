@@ -15,17 +15,15 @@
 | ***Ações do Ator*** | ***Ações do Sistema*** |
 | 1. Participante entra no Organizaê |    |
 |  | 2. exibe menu de opções |
-| 3. Participante seleciona a opção de vizualizar evento |  |
-|  | 4. Sistema exibe todos os eventos disponiveis |
-| 5. Participante seleciona o evento desejado |  |
-|  | 6.  Sistema exibe todos os detalhes do evento |
-| 7. Participante faz sai do app ou volta ao menu de opções |   |
+| 3. Participante seleciona o evento desejado |  |
+|  | 4.  Sistema exibe todos os detalhes do evento |
+| 5. Participante fecha os detalhes do evento |   |
 | **Fluxo Alternativo** | --- |
-| 7a. Participante parcipa do evento |   |
-|  | 8a.  Sistema inicia o caso de Paricipar Evento |
+| 5a. Participante parcipa do evento |   |
+|  | 6a.  Sistema inicia o caso de Paricipar Evento |
 | **Fluxo Alternativo** | --- |
-| 7b. Participante cancela a parcipação do evento |   |
-|  | 8b.  Sistema inicia o caso de Cancelar Paricipação Evento |
+| 5b. Participante cancela a parcipação do evento |   |
+|  | 6b.  Sistema inicia o caso de Cancelar Paricipação Evento |
 | **Fluxo de Exceção** | --- |
 | 1. | |
 |  | 2. |
