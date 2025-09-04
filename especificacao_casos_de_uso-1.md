@@ -4,8 +4,6 @@
 
 # Especificação dos Casos de Uso — App Organizador de Eventos "Organizaê"
 
-*Gerado em: 2025-09-04*
-
 | **Nome do Caso de Uso** | **Vizualizar Evento** |
 |---|---|
 | ***Ator Principal*** | Participante |
