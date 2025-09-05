@@ -14,7 +14,7 @@
 | **Fluxo Principal** | --- |
 | ***Ações do Ator*** | ***Ações do Sistema*** |
 | 1. Participante entra no Organizaê |    |
-|  | 2. exibe menu de opções |
+|  | 2. exibe a home page |
 | 3. Participante seleciona o evento desejado |  |
 |  | 4.  Sistema exibe todos os detalhes do evento |
 | 5. Participante fecha os detalhes do evento |   |
@@ -43,8 +43,8 @@
 | 1. Participante seleciona a opção "Participar" do evento|   |
 |  | 2. Sistema requisita a confirmação da participação do usuário no evento |
 | 3. Participante cofirma a participação   | |      
-|  | 4. Sistema exibe mensagem de confirmação de participação |
-|  |5. Sistema registra a participação do usuário no evento |     
+|  | 4. Sistema registra a participação do usuário no evento |
+|  | 5. Sistema exibe mensagem de confirmação de participação |     
 | **Fluxo Alternativo**  | --- | 
 | | 1a. Sistema identifica que não a login na sessão |
 | | 2a. Sistema redireciona para tela de login |
