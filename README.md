@@ -10,4 +10,4 @@
 
 [Drive Diagramas](https://drive.google.com/drive/folders/1yA8NmS_5dP8JDU45GEyJsG6vqcmJiou2?usp=sharing)
 
-[Pesquisa de Artigos](https://ieeexplore.iee.org)
+[Pesquisa de Artigos](https://ieeexplore.ieee.org/Xplore/home.jsp)
