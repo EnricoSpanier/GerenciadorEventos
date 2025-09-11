@@ -9,3 +9,5 @@
 [Overleaf](https://www.overleaf.com/read/phbgxdpzfzrq#04f856)
 
 [Drive Diagramas](https://drive.google.com/drive/folders/1yA8NmS_5dP8JDU45GEyJsG6vqcmJiou2?usp=sharing)
+
+[Pesquisa de Artigos](https://ieeexplore.iee.org)
