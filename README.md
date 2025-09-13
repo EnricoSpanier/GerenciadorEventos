@@ -12,3 +12,5 @@
 
 [Pesquisa de Artigos](https://ieeexplore.ieee.org/Xplore/home.jsp)
 
+[DBForgeStudio](https://www.devart.com/dbforge/mysql/studio/)
+
