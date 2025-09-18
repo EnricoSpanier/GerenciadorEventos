@@ -36,5 +36,5 @@ Artigos Científicos da Web of Science – Categoria Strings de Busca
 
 An Empirical Study on Challenges of Event Management in Microservice Architectures Link: https://arxiv.org/pdf/2408.00440
 
-Justificativa: Este estudo realiza uma caracterização empírica abrangente das práticas e desafios do gerenciamento de eventos em arquiteturas de microservices, baseada em mineração de repositório e análise manual de uma amostra representativa. Ele identifica problemas práticos recorrentes. As implicações e recomendações do trabalho são diretamente acionáveis para equipes de desenvolvimento e fornecedores de ferramentas, tornando-o extremamente relevante para projetos de marketplaces e sistemas event-driven que dependem de comunicação assíncrona em escala.
+Justificativa: Este estudo realiza uma caracterização empírica abrangente das práticas e desafios do gerenciamento de eventos em arquiteturas de microservices. Ele identifica problemas práticos recorrentes. As implicações e recomendações de trabalho são diretamente aplicaveis alem de fornecer ferramentas, tornando-o extremamente relevante para projetos de marketplaces e sistemas event-driven que dependem de comunicação assíncrona em escala.
 
