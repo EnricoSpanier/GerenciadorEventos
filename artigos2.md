@@ -17,7 +17,7 @@ Link: https://dl.acm.org/doi/10.1145/3532183
 Este estudo contribui ao propor métricas de segurança para comunicação e gerenciamento de identidade em microservices. A relevância está em garantir integração segura via APIs, fortalecendo a confiança dos usuários em marketplaces digitais e sistemas conectados a redes sociais.
 
 5. Design of High Availability Service Discovery for Microservices Architecture
-Link: 
+Link: https://dl.acm.org/doi/abs/10.1145/3312662.3312676
 O artigo aborda a descoberta de serviços com alta disponibilidade em arquiteturas de microservices. Sua pertinência está na relação com escalabilidade e continuidade de serviços em plataformas de marketplace, assegurando eficiência no gerenciamento de eventos.
 ------------------------------------------------------------------------
 
