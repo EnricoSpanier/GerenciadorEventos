@@ -1,5 +1,25 @@
+Artigos Científicos da Web of Science Relacionados ao Contexto (Secure Digital)
 
+1. A Secure Digital Image Marketplace: Microservices and OWASP API Security Using Spring Boot
+Link: https://ieeexplore.ieee.org/document/10750956
+Este artigo é relevante por tratar da implementação de microservices em marketplaces digitais com foco em segurança de APIs. Ele se conecta ao estudo ao abordar escalabilidade e proteção contra vulnerabilidades, aspectos fundamentais para garantir confiança em plataformas que integram APIs comerciais.
 
+2. BlendSM-DDM: BLockchain-ENabled Secure Microservices for Decentralized Data Marketplaces
+Link: https://ieeexplore.ieee.org/document/9071766
+Este trabalho propõe o uso de blockchain para fortalecer a segurança em microservices aplicados a marketplaces descentralizados. A pertinência está na exploração de mecanismos de confiança, autenticação e manutenção, cruciais para o gerenciamento de eventos e dados em ambientes digitais.
+
+3. Online Marketplace: A Benchmark for Data Management in Microservices
+Link: https://dl.acm.org/doi/10.1145/3709653
+O artigo apresenta um benchmark voltado para marketplaces online, com foco em gerenciamento de dados em microservices. Ele é pertinente porque fornece métricas e padrões que permitem avaliar desempenho e eficiência em plataformas comerciais digitais com integração de eventos.
+
+4. Microservice Security Metrics for Secure Communication, Identity Management, and Observability
+Link: https://dl.acm.org/doi/10.1145/3532183
+Este estudo contribui ao propor métricas de segurança para comunicação e gerenciamento de identidade em microservices. A relevância está em garantir integração segura via APIs, fortalecendo a confiança dos usuários em marketplaces digitais e sistemas conectados a redes sociais.
+
+5. Design of High Availability Service Discovery for Microservices Architecture
+Link: 
+O artigo aborda a descoberta de serviços com alta disponibilidade em arquiteturas de microservices. Sua pertinência está na relação com escalabilidade e continuidade de serviços em plataformas de marketplace, assegurando eficiência no gerenciamento de eventos.
+------------------------------------------------------------------------
 
 
 
