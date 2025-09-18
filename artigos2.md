@@ -2,26 +2,39 @@ Artigos Científicos da Web of Science Relacionados ao Contexto (Secure Digital)
 
 1. A Secure Digital Image Marketplace: Microservices and OWASP API Security Using Spring Boot
 Link: https://ieeexplore.ieee.org/document/10750956
-Este artigo é relevante por tratar da implementação de microservices em marketplaces digitais com foco em segurança de APIs. Ele se conecta ao estudo ao abordar escalabilidade e proteção contra vulnerabilidades, aspectos fundamentais para garantir confiança em plataformas que integram APIs comerciais.
+Justificativa: Este artigo é relevante por tratar da implementação de microservices em marketplaces digitais com foco em segurança de APIs. Ele se conecta ao estudo ao abordar escalabilidade e proteção contra vulnerabilidades, aspectos fundamentais para garantir confiança em plataformas que integram APIs comerciais.
 
 2. BlendSM-DDM: BLockchain-ENabled Secure Microservices for Decentralized Data Marketplaces
 Link: https://ieeexplore.ieee.org/document/9071766
-Este trabalho propõe o uso de blockchain para fortalecer a segurança em microservices aplicados a marketplaces descentralizados. A pertinência está na exploração de mecanismos de confiança, autenticação e manutenção, cruciais para o gerenciamento de eventos e dados em ambientes digitais.
+Justificativa: Este trabalho propõe o uso de blockchain para fortalecer a segurança em microservices aplicados a marketplaces descentralizados. A pertinência está na exploração de mecanismos de confiança, autenticação e manutenção, cruciais para o gerenciamento de eventos e dados em ambientes digitais.
 
 3. Online Marketplace: A Benchmark for Data Management in Microservices
 Link: https://dl.acm.org/doi/10.1145/3709653
-O artigo apresenta um benchmark voltado para marketplaces online, com foco em gerenciamento de dados em microservices. Ele é pertinente porque fornece métricas e padrões que permitem avaliar desempenho e eficiência em plataformas comerciais digitais com integração de eventos.
+Justificativa: O artigo apresenta um benchmark voltado para marketplaces online, com foco em gerenciamento de dados em microservices. Ele é pertinente porque fornece métricas e padrões que permitem avaliar desempenho e eficiência em plataformas comerciais digitais com integração de eventos.
 
 4. Microservice Security Metrics for Secure Communication, Identity Management, and Observability
 Link: https://dl.acm.org/doi/10.1145/3532183
-Este estudo contribui ao propor métricas de segurança para comunicação e gerenciamento de identidade em microservices. A relevância está em garantir integração segura via APIs, fortalecendo a confiança dos usuários em marketplaces digitais e sistemas conectados a redes sociais.
+Justificativa: Este estudo contribui ao propor métricas de segurança para comunicação e gerenciamento de identidade em microservices. A relevância está em garantir integração segura via APIs, fortalecendo a confiança dos usuários em marketplaces digitais e sistemas conectados a redes sociais.
 
 5. Design of High Availability Service Discovery for Microservices Architecture
 Link: https://dl.acm.org/doi/abs/10.1145/3312662.3312676
-O artigo aborda a descoberta de serviços com alta disponibilidade em arquiteturas de microservices. Sua pertinência está na relação com escalabilidade e continuidade de serviços em plataformas de marketplace, assegurando eficiência no gerenciamento de eventos.
+Justificativa: O artigo aborda a descoberta de serviços com alta disponibilidade em arquiteturas de microservices. Sua pertinência está na relação com escalabilidade e continuidade de serviços em plataformas de marketplace, assegurando eficiência no gerenciamento de eventos.
 ------------------------------------------------------------------------
+1. MicroServices Suite for Smart City Applications
+Link: https://www.mdpi.com/1424-8220/19/21/4798
+Justificativa: O artigo apresenta uma suíte de microservices aplicada a cidades inteligentes, com foco em integração de dados e soluções IoT. Ele é pertinente ao estudo porque reforça a escalabilidade e a gestão de interações sociais, características que também são fundamentais em marketplaces digitais modernos.
 
+2. The value and structuring role of web APIs in digital innovation
+Link: https://www.sciencedirect.com/science/article/pii/S0048733323002159
+Justificativa: Este trabalho discute como APIs web estruturam a inovação digital e criam valor em plataformas. Sua relevância está em mostrar como integrações por APIs fortalecem marketplaces e o gerenciamento de eventos, garantindo flexibilidade e evolução tecnológica em ambientes comerciais.
 
+3. BUILDING OMNICHANNEL RETAIL COMMERCE WITH EVENT-DRIVEN ARCHITECTURE AND MICROSERVICES
+Link: https://iaeme.com/MasterAdmin/Journal_uploads/IJCET/VOLUME_15_ISSUE_6/IJCET_15_06_092.pdf
+Justificativa: O artigo integra arquitetura orientada a eventos com microservices em soluções de comércio omnichannel. Ele se conecta ao contexto ao explorar como o gerenciamento eficiente de eventos pode melhorar a experiência do usuário em plataformas de marketplace digitais.
+
+4. Next-Generation Retail Catalog Management: AI, Microservices, and Cloud Integration
+Link: https://ijaidsml.org/index.php/ijaidsml/article/download/63/60
+Justificativa: Este estudo aborda o uso de inteligência artificial, microservices e integração em nuvem para gerenciar catálogos de varejo. Sua pertinência está em mostrar como a modularidade e escalabilidade dessas tecnologias podem ser aplicadas em marketplaces, garantindo eficiência na organização de produtos e serviços.
 
 ------------------------------------------------------------------------
 Artigos Científicos da Web of Science Relacionados às Strings de Busca
