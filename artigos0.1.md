@@ -32,7 +32,9 @@ An Empirical Study on Challenges of Event Management in Microservice Architectur
 
 Justificativa: O estudo identifica os principais desafios no gerenciamento de eventos em sistemas orientados a microservices, como garantia de entrega, idempotência e evolução de schemas. Também discute problemas comuns em tracing e coordenação de serviços, apresentando recomendações para mitigação.
 
-Towards a Semantic Message-driven Microservice Platform for Geospatial IoT Ecosystems Link: https://ceur-ws.org/Vol-2110/paper5.pdf
+Artigos Científicos da Web of Science – Categoria Strings de Busca
 
-Justificativa: Propõe uma plataforma semântica orientada a mensagens para microservices em IoT geoespacial. Destaca interoperabilidade, modelagem de mensagens e roteamento semântico, aplicável a marketplaces que utilizam dados em tempo real.
+An Empirical Study on Challenges of Event Management in Microservice Architectures Link: https://arxiv.org/pdf/2408.00440
+
+Justificativa: Este estudo realiza uma caracterização empírica abrangente das práticas e desafios do gerenciamento de eventos em arquiteturas de microservices, baseada em mineração de repositório e análise manual de uma amostra representativa. Ele identifica problemas práticos recorrentes. As implicações e recomendações do trabalho são diretamente acionáveis para equipes de desenvolvimento e fornecedores de ferramentas, tornando-o extremamente relevante para projetos de marketplaces e sistemas event-driven que dependem de comunicação assíncrona em escala.
 
