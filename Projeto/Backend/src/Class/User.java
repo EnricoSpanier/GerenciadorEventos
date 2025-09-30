@@ -1,6 +1,5 @@
 //Pakages declararion
-
-
+package Class;
 
 // import 
 import java.time.LocalDate;
@@ -100,7 +99,6 @@ public class User {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
                 '}';
     }
 }
