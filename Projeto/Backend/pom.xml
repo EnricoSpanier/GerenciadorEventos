@@ -82,7 +82,7 @@
 <groupId>org.springframework.boot</groupId>
 <artifactId>spring-boot-maven-plugin</artifactId>
 <configuration>
-<mainClass>com.gerenciador.eventos.GerenciadorEventosApplication</mainClass>
+<mainClass>com.gerenciador.eventos.Main</mainClass>
 <excludes>
 <exclude>
 <groupId>org.projectlombok</groupId>
