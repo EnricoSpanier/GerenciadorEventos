@@ -1,0 +1,78 @@
+# GerenciadorEventos/Projeto - .gitignore
+# Escopo: somente esta pasta e subpastas de Projeto/
+
+############################
+# SO e editores
+############################
+.DS_Store
+Thumbs.db
+*~
+
+############################
+# IDEs/Editor configs (não obrigatórias no repo)
+############################
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+############################
+# Logs e temporários
+############################
+logs/
+*.log
+*.out
+*.tmp
+.tmp/
+.cache/
+
+############################
+# Docker / runtime
+############################
+.env
+.env.*
+# Overrides locais do compose
+docker-compose.override.yml
+
+############################
+# Java / Maven (Backend)
+############################
+# Saídas de build/tests
+**/target/
+# Relatórios de teste e cobertura (já dentro de target/, mas por redundância)
+Backend/target/surefire-reports/
+Backend/target/failsafe-reports/
+Backend/target/site/
+# Arquivos de IDE no módulo
+Backend/*.iml
+
+############################
+# Flutter (Frontend)
+############################
+frontend/.dart_tool/
+frontend/.packages
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.metadata
+frontend/build/
+frontend/coverage/
+# Importante: mantenha o pubspec.lock de apps Flutter versionado
+# (por isso NÃO está sendo ignorado)
+
+############################
+# Banco de dados (volumes locais, se usados)
+############################
+db/data/
+db/pgdata/
+
+############################
+# Outros
+############################
+# Arquivos de backup comuns
+*.bak
+*.swp
+*.swo

@@ -4,17 +4,19 @@ public class EventWallet {
     private Long user_id;
     private Long event_id;    
     
-// construtor vazio
+    // construtor vazio
     public EventWallet() {
         this.user_id = null;
         this.event_id = null;
     }  
-//construtor completo
+
+    //construtor completo
     public EventWallet(Long user_id, Long event_id) {
         this.user_id = user_id;
         this.event_id = event_id;
     }
-// getters
+
+    // getters
     public Long getUserId() {
         return user_id;
     }
@@ -22,7 +24,8 @@ public class EventWallet {
     public Long getEventId() {
         return event_id;
     }
-//setters
+
+    //setters
     public void setUserId(Long user_id) {
         this.user_id = user_id;
     }
@@ -30,6 +33,7 @@ public class EventWallet {
     public void setEventId(Long event_id) {
         this.event_id = event_id;
     }
+
     @Override
     public String toString() {
         return "EventWallet{" +
@@ -37,5 +41,4 @@ public class EventWallet {
                 ", event_id=" + event_id +
                 '}';
     }
-    
 }

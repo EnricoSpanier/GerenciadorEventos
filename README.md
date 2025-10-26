@@ -14,3 +14,34 @@
 
 [DBForgeStudio](https://www.devart.com/dbforge/mysql/studio/)
 
+
+## 🚀 Containers (Docker) — Guia Rápido
+Para instruções completas, veja `Projeto/README.md`.
+
+Comandos principais (rodar a partir da raiz deste repositório):
+
+```bash
+# subir tudo e (re)construir imagens
+docker compose -f Projeto/docker-compose.yml up -d --build
+
+# verificar status
+docker compose -f Projeto/docker-compose.yml ps
+
+# parar containers (mantém rede/volumes)
+docker compose -f Projeto/docker-compose.yml stop
+
+# derrubar (remove containers e rede)
+docker compose -f Projeto/docker-compose.yml down
+
+# derrubar removendo volume de dados do Postgres (limpa banco)
+docker compose -f Projeto/docker-compose.yml down -v
+```
+
+URLs e portas:
+- Frontend: http://localhost:8088
+- Backend: http://localhost:8081
+- Postgres (host): localhost:5433 (interno: db:5432)
+
+Credenciais/variáveis:
+- Arquivo `.env` em `Projeto/.env` (não versionado). Peça no grupo/time.
+
