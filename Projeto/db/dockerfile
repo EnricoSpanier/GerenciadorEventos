@@ -1,0 +1,19 @@
+# Usar a imagem oficial do PostgreSQL
+FROM postgres:latest
+
+# Definir variáveis de ambiente para configuração inicial do banco
+ENV POSTGRES_USER=admin
+ENV POSTGRES_PASSWORD=senha123
+ENV POSTGRES_DB=meu_banco
+
+# Copiar scripts de inicialização (opcional, para criar tabelas ou inserir dados)
+COPY ./init-scripts/ /docker-entrypoint-initdb.d/
+
+# Expor a porta padrão do PostgreSQL
+EXPOSE 5432
+
+# Definir o volume para persistência de dados
+VOLUME /var/lib/postgresql/data
+
+# Comando padrão para testes
+#docker exec -i pg_local psql -U admin -d meu_banco < "/home/enrico/Área de trabalho/db/init-scripts/99-tests.sql"
