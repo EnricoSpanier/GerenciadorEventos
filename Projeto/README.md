@@ -29,6 +29,26 @@ cd Projeto
 docker compose up -d --build
 ```
 
+## Comandos básicos (resumo)
+Da raiz do repositório:
+
+```bash
+# 1) Build das imagens (sem subir)
+docker compose -f Projeto/docker-compose.yml build
+
+# 2) Ligar (subir) os containers em segundo plano
+docker compose -f Projeto/docker-compose.yml up -d
+
+# 2.1) Ligar reconstruindo as imagens
+docker compose -f Projeto/docker-compose.yml up -d --build
+
+# 3) Desligar (parar) os containers
+docker compose -f Projeto/docker-compose.yml stop
+
+# 4) Derrubar tudo (remove containers e rede)
+docker compose -f Projeto/docker-compose.yml down
+```
+
 ## URLs e portas
 - Frontend: http://localhost:8088
 - Backend:  http://localhost:8081
