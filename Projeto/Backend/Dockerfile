@@ -1,5 +1,5 @@
 ## Estágio de build: compila o jar com Java 21 e Maven 3.9
-FROM maven:3.9.7-eclipse-temurin-21-jammy AS build 
+FROM maven:3.9.7-eclipse-temurin-21-jammy AS build
 WORKDIR /build
 COPY pom.xml .
 COPY src ./src
