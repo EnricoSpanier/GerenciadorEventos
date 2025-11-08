@@ -12,8 +12,10 @@ CREATE TABLE IF NOT EXISTS public.users
     password text COLLATE pg_catalog."default" NOT NULL,
     birthdate date NOT NULL,
     admin boolean NOT NULL DEFAULT false,
+    isActive boolean NOT NULL DEFAULT true,
     created_at timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "User_od" PRIMARY KEY (user_id),
+    updated_at timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "User_id" PRIMARY KEY (user_id),
     CONSTRAINT "Users_email_key" UNIQUE (email),
     CONSTRAINT "Users_fone_key" UNIQUE (fone),
     CONSTRAINT "Users_user_name_key" UNIQUE (user_name)
