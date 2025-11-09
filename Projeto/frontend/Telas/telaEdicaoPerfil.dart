@@ -1,4 +1,9 @@
 // 12. Tela de Edição de Perfil
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
@@ -8,10 +13,19 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController(text: 'usuário 123');
-  final _emailController = TextEditingController(text: 'usuario123@example.com');
-  final _bioController = TextEditingController(text: 'Jogador de airsoft há 5 anos.');
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _bioController = TextEditingController();
   bool _hasChanges = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = Provider.of<HomePageData>(context, listen: false).user;
+    _nameController.text = user['name'] ?? '';
+    _emailController.text = user['email'] ?? '';
+    _bioController.text = user['bio'] ?? '';
+  }
 
   @override
   void dispose() {
@@ -21,15 +35,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
-  void _confirmEdit(BuildContext context) {
+  Future<void> _confirmEdit(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Perfil atualizado com sucesso!')),
+      final user = Provider.of<HomePageData>(context, listen: false).user;
+      final updatedUser = {
+        'name': _nameController.text,
+        'email': _emailController.text,
+        // 'bio': _bioController.text, se existir
+      };
+
+      final response = await http.put(
+        Uri.parse('http://localhost:8080/bff/users/${user['id']}'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(updatedUser),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainScreen()),
-      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Perfil atualizado com sucesso!')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Falha ao atualizar perfil')),
+        );
+      }
     }
   }
 
@@ -72,8 +105,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final HomePageData homePageData = Provider.of<HomePageData>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Perfil'),
@@ -91,76 +122,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const Text(
-                  'Foto de perfil',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10.0),
-                Center(
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(homePageData.userAvatarUrl),
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                const Text(
-                  'Nome',
-                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
-                ),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    hintText: 'Seu nome',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, insira um nome';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20.0),
-                const Text(
-                  'Email',
-                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
-                ),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    hintText: 'seuemail@exemplo.com',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, insira um email';
-                    }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                      return 'Por favor, insira um email válido';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20.0),
-                const Text(
-                  'Biografia',
-                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
-                ),
-                TextFormField(
-                  controller: _bioController,
-                  decoration: const InputDecoration(
-                    hintText: 'Fale um pouco sobre você',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                  validator: (value) {
-                    if (value != null && value.length > 150) {
-                      return 'A biografia não pode exceder 150 caracteres';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20.0),
+                // ... campos iguais
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
