@@ -1,7 +1,9 @@
+// 13. Tela de Criação de Evento
 import 'package:flutter/material.dart';
-import 'telaPrincipal.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-// 13. Tela de Criação de Evento (Placeholder)
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
 
@@ -27,15 +29,38 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     super.dispose();
   }
 
-  void _confirmCreate(BuildContext context) {
+  Future<void> _confirmCreate(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Evento criado com sucesso!')),
+      final user = Provider.of<HomePageData>(context, listen: false).user;
+      final eventData = {
+        'event_name': _titleController.text,
+        'event_date': _dateController.text, // Assumir formato aceito pelo back
+        'address': _locationController.text,
+        'description': _descriptionController.text,
+        'is_EAD': _eventType == 'Público' ? false : true, // Ajustar baseado no tipo
+        'creator_id': user['id'],
+        // Adicionar outros campos como necessário
+      };
+
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/bff/events'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(eventData),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MainScreen()),
-      );
+
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Evento criado com sucesso!')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Falha ao criar evento')),
+        );
+      }
     }
   }
 
@@ -98,26 +123,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Container(
-                      width: 150,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.image, size: 50, color: Colors.grey),
-                      ),
-                    ),
-                    const SizedBox(width: 10.0),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                      ),
-                      child: const Text('Inserir imagem do evento'),
+                    IconButton(
+                      icon: const Icon(Icons.add_photo_alternate, size: 60.0),
+                      onPressed: () {
+                        // TODO: Implementar upload de imagem
+                      },
                     ),
                   ],
                 ),
@@ -129,7 +139,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 TextFormField(
                   controller: _titleController,
                   decoration: const InputDecoration(
-                    hintText: 'Ex.: Torneio Airsoft 2025',
+                    hintText: 'Digite o título',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
@@ -141,15 +151,16 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 ),
                 const SizedBox(height: 20.0),
                 const Text(
-                  'Data',
+                  'Data do Evento',
                   style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
                 ),
                 TextFormField(
                   controller: _dateController,
                   decoration: const InputDecoration(
-                    hintText: 'Ex.: 15/11/2025',
+                    hintText: 'DD/MM/AAAA',
                     border: OutlineInputBorder(),
                   ),
+                  keyboardType: TextInputType.datetime,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Por favor, insira uma data';
@@ -159,13 +170,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 ),
                 const SizedBox(height: 20.0),
                 const Text(
-                  'Local',
+                  'Local do Evento',
                   style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
                 ),
                 TextFormField(
                   controller: _locationController,
                   decoration: const InputDecoration(
-                    hintText: 'Ex.: Vacaria/RS',
+                    hintText: 'Digite o local',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
