@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
-
 // 14. Tela de Pesquisa de Eventos
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 class SearchEventScreen extends StatefulWidget {
   const SearchEventScreen({super.key});
 
@@ -13,24 +15,7 @@ class _SearchEventScreenState extends State<SearchEventScreen> {
   String _selectedDate = 'Qualquer data';
   String _selectedLocation = 'Qualquer local';
   String _selectedType = 'Qualquer tipo';
-  List<Map<String, String>> events = [
-    {
-      'title': 'OPERAÇÃO TROIA III',
-      'date': '25/10/2025',
-      'location': 'Vacaria/RS',
-      'type': 'Privado (Pago)',
-      'description': 'Treinamento avançado de táticas airsoft.',
-      'imageUrl': 'https://i.imgur.com/RCRutFm.png',
-    },
-    {
-      'title': 'Torneio Airsoft 2025',
-      'date': '15/11/2025',
-      'location': 'Porto Alegre/RS',
-      'type': 'Público',
-      'description': 'Competição aberta de airsoft.',
-      'imageUrl': 'https://i.imgur.com/xNdRovc.jpeg',
-    },
-  ];
+  List<Map<String, dynamic>> events = [];
 
   @override
   void dispose() {
@@ -38,12 +23,21 @@ class _SearchEventScreenState extends State<SearchEventScreen> {
     super.dispose();
   }
 
-  List<Map<String, String>> _filterEvents(String searchTerm) {
+  Future<void> _fetchEvents(String term) async {
+    final response = await http.get(Uri.parse('http://localhost:8080/bff/events/search?term=$term'));
+    if (response.statusCode == 200) {
+      setState(() {
+        events = jsonDecode(response.body);
+      });
+    }
+  }
+
+  List<Map<String, dynamic>> _filterEvents(String searchTerm) {
     return events.where((event) {
-      final matchesSearch = event['title']!.toLowerCase().contains(searchTerm.toLowerCase()) ||
-          event['description']!.toLowerCase().contains(searchTerm.toLowerCase());
-      final matchesDate = _selectedDate == 'Qualquer data' || event['date'] == _selectedDate;
-      final matchesLocation = _selectedLocation == 'Qualquer local' || event['location'] == _selectedLocation;
+      final matchesSearch = event['event_name'].toLowerCase().contains(searchTerm.toLowerCase()) ||
+          event['description'].toLowerCase().contains(searchTerm.toLowerCase());
+      final matchesDate = _selectedDate == 'Qualquer data' || event['event_date'] == _selectedDate;
+      final matchesLocation = _selectedLocation == 'Qualquer local' || event['address'] == _selectedLocation;
       final matchesType = _selectedType == 'Qualquer tipo' || event['type'] == _selectedType;
       return matchesSearch && matchesDate && matchesLocation && matchesType;
     }).toList();
@@ -69,7 +63,7 @@ class _SearchEventScreenState extends State<SearchEventScreen> {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
-              onChanged: (value) => setState(() {}),
+              onChanged: (value) => setState(() => _fetchEvents(value)),
             ),
             const SizedBox(height: 16.0),
             Row(
@@ -78,7 +72,7 @@ class _SearchEventScreenState extends State<SearchEventScreen> {
                 DropdownButton<String>(
                   value: _selectedDate,
                   hint: const Text('Qualquer data'),
-                  items: <String>['Qualquer data', '25/10/2025', '15/11/2025']
+                  items: <String>['Qualquer data', '24/03/2024', '20/09/2025']
                       .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -94,7 +88,7 @@ class _SearchEventScreenState extends State<SearchEventScreen> {
                 DropdownButton<String>(
                   value: _selectedLocation,
                   hint: const Text('Qualquer local'),
-                  items: <String>['Qualquer local', 'Vacaria/RS', 'Porto Alegre/RS']
+                  items: <String>['Qualquer local', 'Santiago/RS', 'São Luis/MA']
                       .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -136,23 +130,25 @@ class _SearchEventScreenState extends State<SearchEventScreen> {
                     margin: const EdgeInsets.symmetric(vertical: 8.0),
                     child: ListTile(
                       leading: Image.network(
-                        event['imageUrl']!,
+                        event['imageUrl'] ?? 'https://i.imgur.com/error.png',
                         width: 60,
                         height: 60,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
                       ),
-                      title: Text(event['title']!),
+                      title: Text(event['event_name']),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text('Data: ${event['date']}'),
-                          Text('Local: ${event['location']}'),
+                          Text('Data: ${event['event_date']}'),
+                          Text('Local: ${event['address']}'),
                           Text('Tipo: ${event['type']}'),
                           Text('Descrição: ${event['description']}'),
                         ],
                       ),
-                      onTap: () {},
+                      onTap: () {
+                        // Navegar para detalhes ou inscrição
+                      },
                     ),
                   );
                 },
