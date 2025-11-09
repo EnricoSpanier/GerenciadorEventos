@@ -1,11 +1,48 @@
 // 11. Tela Principal (após login)
-class MainScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'telaPesquisarEvento.dart';
+import 'telaGerenciamentoEvento.dart';
+import 'telaEdicaoPerfil.dart';
+import 'telaCriacaoEvento.dart';
+import 'telaInscriçãoEvento.dart'; // Importar tela de inscrição
+import 'telaHomePage.dart'; // Para deslogar
+
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  List<Map<String, dynamic>> events = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEvents();
+  }
+
+  Future<void> _fetchEvents() async {
+    final response = await http.get(
+      Uri.parse('http://localhost:8080/bff/events/search?term='),
+    );
+    if (response.statusCode == 200) {
+      setState(() {
+        events = jsonDecode(response.body);
+      });
+    } else {
+      // Handle error
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final HomePageData homePageData = Provider.of<HomePageData>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -13,14 +50,19 @@ class MainScreen extends StatelessWidget {
           children: <Widget>[
             Text(
               homePageData.siteName,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18.0,
+              ),
             ),
             const SizedBox(width: 16.0),
             TextButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SearchEventScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const SearchEventScreen(),
+                  ),
                 );
               },
               child: const Text(
@@ -33,7 +75,9 @@ class MainScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ManageEventsScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const ManageEventsScreen(),
+                  ),
                 );
               },
               child: const Text(
@@ -49,17 +93,23 @@ class MainScreen extends StatelessWidget {
               if (value == 'Editar Perfil') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const EditProfileScreen(),
+                  ),
                 );
               } else if (value == 'Criar Evento') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CreateEventScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const CreateEventScreen(),
+                  ),
                 );
               } else if (value == 'Deslogar') {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ),
                 );
               }
             },
@@ -78,152 +128,114 @@ class MainScreen extends StatelessWidget {
               ),
             ],
             child: Padding(
-              padding: const EdgeInsets.only(right: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: CircleAvatar(
                 backgroundImage: NetworkImage(homePageData.userAvatarUrl),
-                radius: 18,
               ),
             ),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundImage: NetworkImage(homePageData.userAvatarUrl),
-                    backgroundColor: Colors.transparent,
-                  ),
-                  const SizedBox(width: 12.0),
-                  Text(
-                    homePageData.userName,
-                    style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
-                  ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const Text(
+                'Eventos em Destaque',
+                style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Card(
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: SizedBox(
-                  height: 400.0,
-                  width: double.infinity,
-                  child: Stack(
-                    children: <Widget>[
-                      Image.network(
-                        'https://i.imgur.com/RCRutFm.png',
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                        errorBuilder: (BuildContext context, Object error,
-                                StackTrace? stackTrace) =>
-                            const Center(child: Icon(Icons.error)),
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 20.0),
-                          child: Text(
-                            homePageData.mainImageOverlayText,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 48.0,
-                              fontWeight: FontWeight.bold,
-                              shadows: <Shadow>[
-                                Shadow(
-                                  blurRadius: 5.0,
-                                  color: Colors.black.withOpacity(0.5),
-                                  offset: const Offset(2.0, 2.0),
+              const SizedBox(height: 16.0),
+              ...events.map((event) => Card(
+                    elevation: 2.0,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      children: <Widget>[
+                        Image.network(
+                          event['imageUrl'] ??
+                              'https://i.imgur.com/default.jpeg',
+                          height: 150.0,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                event['event_name'],
+                                style: const TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 8.0),
+                              Text(event['description']),
+                              const SizedBox(height: 8.0),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      _showEventDetails(context, event);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.purple.shade100,
+                                      foregroundColor: Colors.purple.shade700,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      padding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 16.0,
+                                        vertical: 8.0,
+                                      ),
+                                    ),
+                                    child: const Text('Saber mais'),
+                                  ),
+                                  const SizedBox(width: 8.0),
+                                  IconButton(
+                                    icon: const Icon(Icons.more_vert, size: 28),
+                                    onPressed: () {
+                                      // Ações adicionais
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      IconButton(
-                        icon: const Icon(Icons.share, size: 28),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.star_border, size: 28),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      ElevatedButton(
-                        onPressed: () {
-                          _showEventDetails(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple.shade100,
-                          foregroundColor: Colors.purple.shade700,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 8.0),
-                        ),
-                        child: const Text('saber mais'),
-                      ),
-                      const SizedBox(width: 8.0),
-                      IconButton(
-                        icon: const Icon(Icons.more_vert, size: 28),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+                      ],
+                    ),
+                  )),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _showEventDetails(BuildContext context) {
+  void _showEventDetails(BuildContext context, Map<String, dynamic> event) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Detalhes do Evento'),
+          title: Text(event['event_name']),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              children: const <Widget>[
-                Text('Descrição:'),
-                Text('Nome do Evento: OPERAÇÃO TROIA III'),
-                Text('Organizadores: EquipeHard'),
-                Text('Data do evento: 25/10/2025'),
-                Text('Local do evento: Vacaria/RS'),
-                Text('Tipo de evento: privado (Pago)'),
-                Text('Nota do organizador: Treinamento avançado de táticas airsoft.'),
+              children: <Widget>[
+                Text('Descrição: ${event['description']}'),
+                Text('Organizadores: ${event['presenters'].join(', ')}'),
+                Text('Data do evento: ${event['event_date']}'),
+                Text('Local do evento: ${event['address']}'),
+                Text('Tipo de evento: '
+                    '${event['is_EAD'] ? 'EAD' : 'Presencial'}'),
               ],
             ),
           ),
@@ -239,7 +251,10 @@ class MainScreen extends StatelessWidget {
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        EventRegistrationScreen(event: event),
+                  ),
                 );
               },
               child: const Text('Inscrever-se'),
