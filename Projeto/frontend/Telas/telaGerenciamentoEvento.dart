@@ -1,4 +1,9 @@
-// 15. Tela de Gerenciamento de Eventos (Placeholder)
+// 15. Tela de Gerenciamento de Eventos
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 class ManageEventsScreen extends StatefulWidget {
   const ManageEventsScreen({super.key});
 
@@ -7,49 +12,63 @@ class ManageEventsScreen extends StatefulWidget {
 }
 
 class _ManageEventsScreenState extends State<ManageEventsScreen> {
-  List<Map<String, String>> enrolledEvents = [
-    {
-      'title': 'Operação maremoto',
-      'date': '24/03/2024',
-      'location': 'Santiago/RS',
-      'type': 'Privado (Pago)',
-      'description': 'Campo competitivo.',
-      'imageUrl': 'https://i.imgur.com/9bAW1CR.png',
-    },
-    {
-      'title': 'Operação Serpente',
-      'date': '20/09/2025',
-      'location': 'São Luis/MA',
-      'type': 'Público',
-      'description': 'Competição aberta de airsoft.',
-      'imageUrl': 'https://i.imgur.com/dM6Svwd.png',
-    },
-  ];
+  List<Map<String, dynamic>> enrolledEvents = [];
+  List<Map<String, dynamic>> createdEvents = [];
 
-  List<Map<String, String>> createdEvents = [
-    {
-      'title': 'Comando Selva',
-      'date': '05/06/2025',
-      'location': 'Tabaí/RS',
-      'type': 'Privado (Pago)',
-      'description': 'Campo competitivo.',
-      'imageUrl': 'https://i.imgur.com/5wS9K3j.png',
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchEvents();
+  }
 
-  void _showDetailsDialog(BuildContext context, Map<String, String> event) {
+  Future<void> _fetchEvents() async {
+    final user = Provider.of<HomePageData>(context, listen: false).user;
+    final userId = user['id'];
+
+    // Enrolled
+    final enrolledResponse = await http.get(
+      Uri.parse('http://localhost:8080/bff/event-wallets/user/$userId'),
+    );
+    if (enrolledResponse.statusCode == 200) {
+      final wallets = jsonDecode(enrolledResponse.body) as List;
+      List<Map<String, dynamic>> events = [];
+      for (var wallet in wallets) {
+        final eventResponse = await http.get(
+          Uri.parse('http://localhost:8080/bff/events/${wallet['eventId']}'),
+        );
+        if (eventResponse.statusCode == 200) {
+          events.add(jsonDecode(eventResponse.body));
+        }
+      }
+      setState(() {
+        enrolledEvents = events;
+      });
+    }
+
+    // Created
+    final createdResponse = await http.get(
+      Uri.parse('http://localhost:8080/bff/events?creator_id=$userId'),
+    );
+    if (createdResponse.statusCode == 200) {
+      setState(() {
+        createdEvents = jsonDecode(createdResponse.body);
+      });
+    }
+  }
+
+  void _showDetailsDialog(BuildContext context, Map<String, dynamic> event) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(event['title']!),
+          title: Text(event['event_name']),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text('Data: ${event['date']}'),
-                Text('Local: ${event['location']}'),
+                Text('Data: ${event['event_date']}'),
+                Text('Local: ${event['address']}'),
                 Text('Tipo: ${event['type']}'),
                 Text('Descrição: ${event['description']}'),
               ],
@@ -68,7 +87,7 @@ class _ManageEventsScreenState extends State<ManageEventsScreen> {
     );
   }
 
-  void _showCancelConfirmation(BuildContext context, Map<String, String> event) {
+  void _showCancelConfirmation(BuildContext context, Map<String, dynamic> event) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -83,14 +102,22 @@ class _ManageEventsScreenState extends State<ManageEventsScreen> {
               child: const Text('Não'),
             ),
             TextButton(
-              onPressed: () {
-                setState(() {
-                  enrolledEvents.remove(event);
-                });
+              onPressed: () async {
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Inscrição cancelada!')),
+                final user = Provider.of<HomePageData>(context, listen: false).user;
+                final userId = user['id'];
+                final eventId = event['event_id'];
+                final response = await http.delete(
+                  Uri.parse('http://localhost:8080/bff/event-wallets?userId=$userId&eventId=$eventId'),
                 );
+                if (response.statusCode == 200) {
+                  setState(() {
+                    enrolledEvents.remove(event);
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Inscrição cancelada!')),
+                  );
+                }
               },
               child: const Text('Sim'),
             ),
@@ -108,111 +135,109 @@ class _ManageEventsScreenState extends State<ManageEventsScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              const Text(
-                'Eventos Inscritos',
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8.0),
-              ...enrolledEvents.map((event) {
-                return Card(
-                  elevation: 2.0,
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    leading: Image.network(
-                      event['imageUrl']!,
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
-                    ),
-                    title: Text(event['title']!),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text('Data: ${event['date']}'),
-                        Text('Local: ${event['location']}'),
-                        Text('Tipo: ${event['type']}'),
-                      ],
-                    ),
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (String value) {
-                        if (value == 'Ver Detalhes') {
-                          _showDetailsDialog(context, event);
-                        } else if (value == 'Cancelar Inscrição') {
-                          _showCancelConfirmation(context, event);
-                        }
-                      },
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(
-                          value: 'Ver Detalhes',
-                          child: Text('Ver Detalhes'),
-                        ),
-                        const PopupMenuItem<String>(
-                          value: 'Cancelar Inscrição',
-                          child: Text('Cancelar Inscrição'),
-                        ),
-                      ],
-                      icon: const Icon(Icons.more_vert),
-                    ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            const Text(
+              'Eventos Inscritos',
+              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            ...enrolledEvents.map((event) {
+              return Card(
+                elevation: 2.0,
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ListTile(
+                  leading: Image.network(
+                    event['imageUrl'] ?? 'https://i.imgur.com/error.png',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
                   ),
-                );
-              }).toList(),
-              const SizedBox(height: 16.0),
-              const Text(
-                'Eventos Criados por Você',
-                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8.0),
-              ...createdEvents.map((event) {
-                return Card(
-                  elevation: 2.0,
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    leading: Image.network(
-                      event['imageUrl']!,
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
-                    ),
-                    title: Text(event['title']!),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text('Data: ${event['date']}'),
-                        Text('Local: ${event['location']}'),
-                        Text('Tipo: ${event['type']}'),
-                      ],
-                    ),
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (String value) {
-                        if (value == 'Ver Detalhes') {
-                          _showDetailsDialog(context, event);
-                        } else if (value == 'Gerenciar Evento') {
-                          // TODO: Navegar para tela de gerenciamento de evento
-                        }
-                      },
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(
-                          value: 'Ver Detalhes',
-                          child: Text('Ver Detalhes'),
-                        ),
-                        const PopupMenuItem<String>(
-                          value: 'Gerenciar Evento',
-                          child: Text('Gerenciar Evento'),
-                        ),
-                      ],
-                      icon: const Icon(Icons.more_vert),
-                    ),
+                  title: Text(event['event_name']),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('Data: ${event['event_date']}'),
+                      Text('Local: ${event['address']}'),
+                      Text('Tipo: ${event['type']}'),
+                    ],
                   ),
-                );
-              }).toList(),
-            ],
-          ),
+                  trailing: PopupMenuButton<String>(
+                    onSelected: (String value) {
+                      if (value == 'Ver Detalhes') {
+                        _showDetailsDialog(context, event);
+                      } else if (value == 'Cancelar Inscrição') {
+                        _showCancelConfirmation(context, event);
+                      }
+                    },
+                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'Ver Detalhes',
+                        child: Text('Ver Detalhes'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'Cancelar Inscrição',
+                        child: Text('Cancelar Inscrição'),
+                      ),
+                    ],
+                    icon: const Icon(Icons.more_vert),
+                  ),
+                ),
+              );
+            }).toList(),
+            const SizedBox(height: 16.0),
+            const Text(
+              'Eventos Criados por Você',
+              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8.0),
+            ...createdEvents.map((event) {
+              return Card(
+                elevation: 2.0,
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ListTile(
+                  leading: Image.network(
+                    event['imageUrl'] ?? 'https://i.imgur.com/error.png',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+                  ),
+                  title: Text(event['event_name']),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('Data: ${event['event_date']}'),
+                      Text('Local: ${event['address']}'),
+                      Text('Tipo: ${event['type']}'),
+                    ],
+                  ),
+                  trailing: PopupMenuButton<String>(
+                    onSelected: (String value) {
+                      if (value == 'Ver Detalhes') {
+                        _showDetailsDialog(context, event);
+                      } else if (value == 'Gerenciar Evento') {
+                        // TODO: Navegar para gerenciamento
+                      }
+                    },
+                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'Ver Detalhes',
+                        child: Text('Ver Detalhes'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'Gerenciar Evento',
+                        child: Text('Gerenciar Evento'),
+                      ),
+                    ],
+                    icon: const Icon(Icons.more_vert),
+                  ),
+                ),
+              );
+            }).toList(),
+          ],
         ),
       ),
     );
