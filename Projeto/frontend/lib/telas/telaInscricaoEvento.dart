@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'auth.dart';
 import 'package:intl/intl.dart';
 import 'telaHomePage.dart'; // HomePageData
 import 'telaPrincipal.dart'; // MainScreen
@@ -71,14 +72,11 @@ class _EventRegistrationScreenState extends State<EventRegistrationScreen> {
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
-      
+      // Usar ApiAuth para obter headers (centraliza token JWT)
+      final headers = ApiAuth.jsonHeaders();
       final response = await http.get(
         Uri.parse('/api/bff/events/${widget.eventId}'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
@@ -137,15 +135,11 @@ class _EventRegistrationScreenState extends State<EventRegistrationScreen> {
     };
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
-      
+      // Usar ApiAuth para enviar o header Authorization corretamente
+      final headers = ApiAuth.jsonHeaders();
       final response = await http.post(
         Uri.parse('/api/bff/event-wallets'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        headers: headers,
         body: jsonEncode(enrollment),
       );
 

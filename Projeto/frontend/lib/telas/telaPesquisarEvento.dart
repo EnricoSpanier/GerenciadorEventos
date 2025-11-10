@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'auth.dart';
 import 'package:intl/intl.dart';
 import 'telaInscricaoEvento.dart';
 
@@ -45,9 +46,8 @@ class _SearchEventScreenState extends State<SearchEventScreen> {
   }
 
   Future<void> _checkAuthentication() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
-    if (token == null || token.isEmpty) {
+    // Usar o utilitário ApiAuth para checar token
+    if (ApiAuth.token == null || ApiAuth.token!.isEmpty) {
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/login');
       }
@@ -67,15 +67,12 @@ class _SearchEventScreenState extends State<SearchEventScreen> {
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
-      
+      // Usar ApiAuth para fornecer headers com Authorization se houver token
+      final headers = ApiAuth.jsonHeaders();
       // Busca todos os eventos (termo vazio retorna todos)
       final response = await http.get(
         Uri.parse('/api/bff/events/search?term='),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {

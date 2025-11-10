@@ -48,7 +48,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // Verificar autenticação ao carregar a tela
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAuthentication();
+      // Carregar dados mais recentes do usuário após verificar autenticação
+      _loadUserData();
     });
+    // Inicializar com dados atuais (serão atualizados por _loadUserData)
     final user = Provider.of<HomePageData>(context, listen: false).user;
     if (user != null) {
       _nameController.text = user['name'] ?? '';
@@ -72,6 +75,48 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             MaterialPageRoute(builder: (context) => const MainScreen()),
           );
         },
+      );
+    }
+  }
+
+  Future<void> _loadUserData() async {
+    final user = Provider.of<HomePageData>(context, listen: false).user;
+    if (user == null || user['user_id'] == null) return;
+
+    try {
+      final response = await http.get(
+        Uri.parse('/api/bff/users/${user['user_id']}'),
+        headers: ApiAuth.jsonHeaders(),
+      );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final userData = jsonDecode(response.body);
+        // Atualizar dados no Provider
+        Provider.of<HomePageData>(context, listen: false).setUser(userData);
+        // Atualizar controladores com dados mais recentes
+        setState(() {
+          _nameController.text = userData['name'] ?? '';
+          _emailController.text = userData['email'] ?? '';
+          _phoneController.text = userData['fone'] ?? '';
+        });
+      } else {
+        // Opcional: Mostrar erro se falhar ao carregar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao carregar dados do perfil: ${response.statusCode}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Erro de conexão ao carregar dados do perfil'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
