@@ -1,8 +1,32 @@
+// ==============================================================================
+// TELA HOME PAGE (LANDING PAGE - ANTES DO LOGIN)
+// ==============================================================================
+// Função: Página inicial pública do sistema - primeiro contato do visitante
+// 
+// Funcionalidades:
+// - Barra de navegação com nome do site e botões de Login/Cadastro
+// - Imagem de destaque com texto overlay
+// - Visualização pública de eventos disponíveis (sem autenticação)
+// - Busca de eventos (endpoint público: /api/bff/events/search)
+// - Cards de eventos com informações básicas
+// - Navegação para tela de login
+// - Navegação para tela de cadastro
+// - Provider (HomePageData): gerencia estado global do usuário e eventos
+// 
+// Componentes:
+// - HomePageData: ChangeNotifier com dados do usuário e eventos
+// - MyApp: Widget raiz da aplicação
+// - HomeScreen: Página inicial com lista de eventos
+// ==============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'auth.dart';
 import 'dart:convert';
-import 'telas/telaLogin.dart'; // Assumindo import
+import 'telaLogin.dart'; // corrigido caminho relativo
+import 'telaPesquisarEvento.dart'; // SearchEventScreen
+import 'telaCriacaoEvento.dart'; // CreateEventScreen
 
 // 1. DATA_MODEL
 class HomePageData extends ChangeNotifier {
@@ -13,6 +37,7 @@ class HomePageData extends ChangeNotifier {
   String mainImageUrl;
   String mainImageOverlayText;
   List<Map<String, dynamic>> events = []; // Adicionado para eventos dinâmicos
+  Map<String, dynamic> user = {}; // Armazena usuário logado (id, name, email, etc.)
 
   HomePageData()
       : siteName = 'Organizador de Eventos',
@@ -25,8 +50,13 @@ class HomePageData extends ChangeNotifier {
         mainImageOverlayText = '';
 
   void setUser(dynamic user) {
-    userName = user['name'];
-    // Atualizar avatar se disponível
+    if (user is Map<String, dynamic>) {
+      this.user = user;
+      userName = user['name'] ?? userName;
+      if (user.containsKey('avatarUrl')) {
+        userAvatarUrl = user['avatarUrl'];
+      }
+    }
     notifyListeners();
   }
 
@@ -74,7 +104,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _fetchEvents() async {
-    final response = await http.get(Uri.parse('http://localhost:8080/bff/events/search?term='));
+  final response = await http.get(
+    Uri.parse('/api/bff/events/search?term='),
+    headers: ApiAuth.jsonHeaders(),
+  );
     if (response.statusCode == 200) {
       final eventsData = jsonDecode(response.body) as List;
       Provider.of<HomePageData>(context, listen: false).setEvents(eventsData.map((e) => e as Map<String, dynamic>).toList());
@@ -108,6 +141,9 @@ class _TopNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Verificar se há usuário logado
+    final bool isLoggedIn = homePageData.user != null && homePageData.user.isNotEmpty;
+    
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -118,15 +154,36 @@ class _TopNavigationBar extends StatelessWidget {
               homePageData.siteName,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
             ),
-            IconButton(
-              icon: const Icon(Icons.more_vert, size: 28),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
-              },
-            ),
+            // Mostrar ícone de usuário se logado, senão mostrar botão de menu
+            if (isLoggedIn)
+              Row(
+                children: [
+                  Text(
+                    homePageData.user['name'] ?? homePageData.user['email'] ?? 'Usuário',
+                    style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(width: 8),
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Colors.blue.shade100,
+                    child: Icon(
+                      Icons.person,
+                      color: Colors.blue.shade700,
+                      size: 20,
+                    ),
+                  ),
+                ],
+              )
+            else
+              IconButton(
+                icon: const Icon(Icons.more_vert, size: 28),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  );
+                },
+              ),
           ],
         ),
       ),
@@ -136,3 +193,118 @@ class _TopNavigationBar extends StatelessWidget {
 
 // Outros widgets ajustados para usar homePageData.events em vez de hardcode, ex.: em _MainContentCard
 // Por exemplo, substituir hardcoded cards por ListView de homePageData.events
+
+// Seção de perfil do usuário
+class _UserProfileSection extends StatelessWidget {
+  final HomePageData homePageData;
+  const _UserProfileSection({required this.homePageData});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundImage: NetworkImage(homePageData.userAvatarUrl),
+            radius: 32,
+          ),
+            const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(homePageData.userName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text('Bem-vindo de volta!'),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+// Card principal com eventos listados dinamicamente
+class _MainContentCard extends StatelessWidget {
+  final HomePageData homePageData;
+  const _MainContentCard({required this.homePageData});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Eventos em Destaque', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          for (final e in homePageData.events)
+            Card(
+              elevation: 2,
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (e['imageUrl'] != null)
+                    Image.network(
+                      e['imageUrl'],
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(e['event_name'] ?? 'Sem nome', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Text(e['description'] ?? 'Sem descrição'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (homePageData.events.isEmpty)
+            const Text('Nenhum evento encontrado.'),
+        ],
+      ),
+    );
+  }
+}
+
+// Seção de botões de ação simples
+class _ActionButtonsSection extends StatelessWidget {
+  const _ActionButtonsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchEventScreen()),
+              );
+            },
+            child: const Text('Explorar'),
+          ),
+          const SizedBox(width: 16),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CreateEventScreen()),
+              );
+            },
+            child: const Text('Criar Evento'),
+          ),
+        ],
+      ),
+    );
+  }
+}

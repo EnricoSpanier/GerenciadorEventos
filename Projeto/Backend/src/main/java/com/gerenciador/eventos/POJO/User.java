@@ -2,6 +2,8 @@ package com.gerenciador.eventos.POJO;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * POJO puro - apenas dados, sem lógica de negócio ou acesso ao banco
  */
@@ -37,14 +39,17 @@ public class User {
     }
 
     // Getters
+    @JsonProperty("user_id")
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getFone() { return fone; }
     public String getPassword() { return password; }
+    @JsonProperty("birthdate")
     public String getBirthDate() { return birthDate; }
     public Boolean getIsAdmin() { return isAdmin; }
     public Boolean getIsActive() { return isActive; }
+    @JsonProperty("created_at")
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
@@ -54,9 +59,11 @@ public class User {
     public void setEmail(String email) { this.email = email; }
     public void setFone(String fone) { this.fone = fone; }
     public void setPassword(String password) { this.password = password; }
+    @JsonProperty("birthdate")
     public void setBirthDate(String birthDate) { this.birthDate = birthDate; }
     public void setIsAdmin(Boolean isAdmin) { this.isAdmin = isAdmin; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+    @JsonProperty("created_at")
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 

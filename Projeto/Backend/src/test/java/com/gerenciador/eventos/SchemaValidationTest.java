@@ -17,7 +17,6 @@ import com.gerenciador.eventos.TestSupport.GlobalDbTruncator;
 
 @SpringBootTest
 @Import(GlobalDbTruncator.class)
-@SuppressWarnings("unused")
 public class SchemaValidationTest {
 
     @Autowired

@@ -195,6 +195,9 @@ public class UserRepository {
      * Atualizar usuário
      */
     public User update(User user) {
+        // Buscar usuário existente para preservar senha
+        User existing = findById(user.getId());
+        
         String sql = "UPDATE users SET user_name = ?, email = ?, fone = ?, password = ?, " +
                      "birthdate = ?, admin = ? WHERE user_id = ?";
         
@@ -204,13 +207,16 @@ public class UserRepository {
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getFone());
-            stmt.setString(4, user.getPassword());
+            // Preservar senha existente se não foi fornecida nova senha
+            stmt.setString(4, user.getPassword() != null ? user.getPassword() : existing.getPassword());
             Date birthdateVal = toSqlDate(user.getBirthDate());
-            if (birthdateVal == null) {
+            if (birthdateVal == null && existing.getBirthDate() != null) {
+                birthdateVal = toSqlDate(existing.getBirthDate());
+            } else if (birthdateVal == null) {
                 birthdateVal = Date.valueOf(LocalDate.now());
             }
             stmt.setDate(5, birthdateVal);
-            stmt.setBoolean(6, toPrimitive(user.getIsAdmin()));
+            stmt.setBoolean(6, user.getIsAdmin() != null ? toPrimitive(user.getIsAdmin()) : toPrimitive(existing.getIsAdmin()));
             stmt.setLong(7, user.getId());
             stmt.executeUpdate();
 

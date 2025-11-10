@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +44,8 @@ public class EventRepository {
         }
 
             // buy_time_limit: definimos via aplicação
-            String sql = "INSERT INTO event (creator_id, event_name, ead, address, event_date, buy_time_limit, capacity, quant, description) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO event (creator_id, event_name, ead, address, event_date, buy_time_limit, capacity, quant, description, image_data) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (Connection conn = databaseConnection.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -64,6 +66,12 @@ public class EventRepository {
                 }
                 stmt.setInt(idx++, e.getQuantity());
                 stmt.setString(idx++, e.getDescription() != null ? e.getDescription() : "");
+                // Imagem
+                if (e.getImage_data() != null) {
+                    stmt.setBytes(idx++, e.getImage_data());
+                } else {
+                    stmt.setNull(idx++, java.sql.Types.BINARY);
+                }
 
                 stmt.executeUpdate();
 
@@ -124,6 +132,22 @@ public class EventRepository {
         }
     }
 
+    /** Listar todos os eventos */
+    public List<Event> findAll() {
+        String sql = "SELECT * FROM event ORDER BY event_id";
+        List<Event> list = new ArrayList<>();
+        try (Connection conn = databaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(map(rs));
+            }
+            return list;
+        } catch (SQLException ex) {
+            throw new RuntimeException("Erro ao listar eventos: " + ex.getMessage(), ex);
+        }
+    }
+
     /** Atualizar evento existente */
     public Event update(Event e) {
         if (e.getEvent_id() == null) {
@@ -136,7 +160,7 @@ public class EventRepository {
         if (updateBuyLimit) {
             sb.append("buy_time_limit = ?, ");
         }
-        sb.append("capacity = ?, quant = ?, description = ? WHERE event_id = ?");
+        sb.append("capacity = ?, quant = ?, description = ?, image_data = ? WHERE event_id = ?");
         String upSql = sb.toString();
 
         try (Connection conn = databaseConnection.getConnection();
@@ -158,6 +182,12 @@ public class EventRepository {
             }
             stmt.setInt(idx++, e.getQuantity());
             stmt.setString(idx++, e.getDescription() != null ? e.getDescription() : "");
+            // image_data: aceita null
+            if (e.getImage_data() != null) {
+                stmt.setBytes(idx++, e.getImage_data());
+            } else {
+                stmt.setNull(idx++, java.sql.Types.BINARY);
+            }
             long eventIdVal = Objects.requireNonNull(e.getEvent_id(), "event_id não pode ser nulo");
             stmt.setLong(idx++, eventIdVal);
 
@@ -215,12 +245,37 @@ public class EventRepository {
         if (!rs.wasNull()) e.setLot_quantity(capacity);
         e.setQuantity(rs.getInt("quant"));
         e.setDescription(rs.getString("description"));
+        // Imagem (coluna pode não existir em bancos antigos)
+        if (hasColumn(rs, "image_data")) {
+            byte[] imageData = rs.getBytes("image_data");
+            if (imageData != null) e.setImage_data(imageData);
+        }
         Timestamp createdAt = rs.getTimestamp("created_at");
         if (createdAt != null) e.setCreatedAt(createdAt.toLocalDateTime());
         Timestamp updatedAt = rs.getTimestamp("updated_at");
         if (updatedAt != null) e.setUpdatedAt(updatedAt.toLocalDateTime());
         // presenters não está no schema -> manter lista vazia ou a recebida externamente
         return e;
+    }
+
+    /**
+     * Verifica se o ResultSet contém uma coluna com o nome dado.
+     * Usado para compatibilidade com esquemas antigos que ainda não tenham a coluna image_data.
+     */
+    private boolean hasColumn(ResultSet rs, String columnName) {
+        try {
+            java.sql.ResultSetMetaData meta = rs.getMetaData();
+            int cols = meta.getColumnCount();
+            for (int i = 1; i <= cols; i++) {
+                String label = meta.getColumnLabel(i);
+                if (columnName.equalsIgnoreCase(label)) return true;
+                String name = meta.getColumnName(i);
+                if (columnName.equalsIgnoreCase(name)) return true;
+            }
+        } catch (SQLException ex) {
+            // se falhar, assume que a coluna não existe
+        }
+        return false;
     }
 
     private boolean toPrimitive(Boolean b) {

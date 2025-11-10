@@ -1,6 +1,11 @@
 # Usar a imagem oficial do PostgreSQL
 FROM postgres:16-alpine
 
+# Definir encoding UTF-8 como padrão
+ENV LANG=pt_BR.UTF-8
+ENV LC_ALL=pt_BR.UTF-8
+ENV POSTGRES_INITDB_ARGS="--encoding=UTF8 --locale=pt_BR.UTF-8"
+
 # Variáveis de ambiente serão fornecidas em tempo de execução via docker-compose (.env)
 
 # Copiar scripts de inicialização (opcional, para criar tabelas ou inserir dados)

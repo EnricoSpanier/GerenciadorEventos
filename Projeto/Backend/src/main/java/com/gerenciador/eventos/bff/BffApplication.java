@@ -1,26 +1,31 @@
 package com.gerenciador.eventos.bff;
 
-import com.gerenciador.eventos.POJO.Event;
-import com.gerenciador.eventos.POJO.EventWallet;
-import com.gerenciador.eventos.POJO.MyWallet;
-import com.gerenciador.eventos.POJO.User;
-import com.gerenciador.eventos.Repository.EventRepository;
-import com.gerenciador.eventos.Repository.EventWalletRepository;
-import com.gerenciador.eventos.Repository.MyWalletRepository;
-import com.gerenciador.eventos.Repository.UserRepository;
-import com.gerenciador.eventos.Service.EventService;
-import com.gerenciador.eventos.Service.EventWalletService;
-import com.gerenciador.eventos.Service.MyWalletService;
-import com.gerenciador.eventos.Service.UserService;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.gerenciador.eventos.POJO.Event;
+import com.gerenciador.eventos.POJO.EventWallet;
+import com.gerenciador.eventos.POJO.MyWallet;
+import com.gerenciador.eventos.POJO.User;
+import com.gerenciador.eventos.Service.EventService;
+import com.gerenciador.eventos.Service.EventWalletService;
+import com.gerenciador.eventos.Service.MyWalletService;
+import com.gerenciador.eventos.Service.UserService;
 
 // Scan for packages as per structure
 @SpringBootApplication
@@ -36,9 +41,11 @@ public class BffApplication {
     @RequestMapping("/bff/users")
     public static class UserBffController {
         private final UserService userService;
+        private final com.gerenciador.eventos.security.JwtUtil jwtUtil;
 
-        public UserBffController(UserService userService) {
+        public UserBffController(UserService userService, com.gerenciador.eventos.security.JwtUtil jwtUtil) {
             this.userService = userService;
+            this.jwtUtil = jwtUtil;
         }
 
         @PostMapping
@@ -86,6 +93,32 @@ public class BffApplication {
             }
         }
 
+        @PutMapping("/{id}/password")
+        public ResponseEntity<?> changePassword(@PathVariable Long id, @RequestBody java.util.Map<String, String> passwords) {
+            try {
+                String oldPassword = passwords.get("oldPassword");
+                String newPassword = passwords.get("newPassword");
+                
+                if (oldPassword == null || oldPassword.isEmpty()) {
+                    return ResponseEntity.badRequest().body("Senha atual é obrigatória");
+                }
+                if (newPassword == null || newPassword.isEmpty()) {
+                    return ResponseEntity.badRequest().body("Nova senha é obrigatória");
+                }
+                
+                boolean success = userService.changePassword(id, oldPassword, newPassword);
+                if (success) {
+                    return ResponseEntity.ok("Senha alterada com sucesso");
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao alterar senha");
+                }
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao alterar senha: " + e.getMessage());
+            }
+        }
+
         @DeleteMapping("/{id}")
         public ResponseEntity<?> deleteUser(@PathVariable Long id) {
             try {
@@ -107,12 +140,38 @@ public class BffApplication {
         }
 
         @PostMapping("/login")
-        public ResponseEntity<User> login(@RequestBody User loginRequest) {
+        public ResponseEntity<?> login(@RequestBody User loginRequest) {
             User user = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
             if (user != null) {
-                return ResponseEntity.ok(user);
+                // Gerar token JWT (injeção manual simples)
+                String token = jwtUtil.generateToken(user.getEmail());
+                java.util.Map<String, Object> body = new java.util.HashMap<>();
+                body.put("user", user);
+                body.put("token", token);
+                return ResponseEntity.ok(body);
             }
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
+        }
+
+        @GetMapping("/me")
+        public ResponseEntity<?> getCurrentUser() {
+            try {
+                // O email vem do SecurityContext populado pelo JwtAuthenticationFilter
+                org.springframework.security.core.Authentication auth = 
+                    org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+                
+                if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                    String email = auth.getName(); // Email do subject do JWT
+                    User user = userService.findByEmail(email);
+                    if (user != null) {
+                        return ResponseEntity.ok(user);
+                    }
+                }
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Não autenticado");
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao buscar usuário: " + e.getMessage());
+            }
         }
     }
 
@@ -199,6 +258,99 @@ public class BffApplication {
         @GetMapping("/search")
         public ResponseEntity<List<Event>> searchEvents(@RequestParam String term) {
             return ResponseEntity.ok(eventService.searchEvents(term));
+        }
+
+        @GetMapping
+        public ResponseEntity<List<Event>> getEventsByCreator(@RequestParam(required = false) Long creator_id) {
+            if (creator_id == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            try {
+                List<Event> events = eventService.findByCreatorId(creator_id);
+                return ResponseEntity.ok(events);
+            } catch (RuntimeException ex) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            }
+        }
+
+        @PostMapping(value = "/{id}/image", consumes = "multipart/form-data")
+        public ResponseEntity<?> uploadEventImage(
+                @PathVariable Long id,
+                @RequestParam("image") org.springframework.web.multipart.MultipartFile file) {
+            try {
+                // Validar tamanho do arquivo (max 5MB)
+                if (file.getSize() > 5 * 1024 * 1024) {
+                    return ResponseEntity.badRequest().body("Imagem muito grande. Tamanho máximo: 5MB");
+                }
+
+                // Validar tipo do arquivo
+                String contentType = file.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    return ResponseEntity.badRequest().body("Arquivo deve ser uma imagem");
+                }
+
+                // Ler e converter para JPG
+                byte[] imageBytes = convertToJpg(file.getBytes(), file.getContentType());
+
+                // Buscar evento e atualizar imagem
+                Event event = eventService.findById(id);
+                event.setImage_data(imageBytes);
+                eventService.updateEvent(event);
+
+                return ResponseEntity.ok("Imagem carregada com sucesso");
+            } catch (RuntimeException ex) {
+                return ResponseEntity.notFound().build();
+            } catch (Exception ex) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Erro ao carregar imagem: " + ex.getMessage());
+            }
+        }
+
+        @GetMapping("/{id}/image")
+        public ResponseEntity<byte[]> getEventImage(@PathVariable Long id) {
+            try {
+                Event event = eventService.findById(id);
+                byte[] imageData = event.getImage_data();
+                
+                if (imageData == null || imageData.length == 0) {
+                    return ResponseEntity.notFound().build();
+                }
+
+                return ResponseEntity.ok()
+                        .header("Content-Type", "image/jpeg")
+                        .header("Cache-Control", "max-age=3600")
+                        .body(imageData);
+            } catch (RuntimeException ex) {
+                return ResponseEntity.notFound().build();
+            }
+        }
+
+        private byte[] convertToJpg(byte[] inputBytes, String contentType) throws Exception {
+            java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(inputBytes);
+            java.awt.image.BufferedImage image = javax.imageio.ImageIO.read(bais);
+            
+            if (image == null) {
+                throw new IllegalArgumentException("Não foi possível ler a imagem");
+            }
+
+            // Converter para RGB se necessário (remover alpha channel)
+            java.awt.image.BufferedImage rgbImage = new java.awt.image.BufferedImage(
+                    image.getWidth(), image.getHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
+            rgbImage.createGraphics().drawImage(image, 0, 0, java.awt.Color.WHITE, null);
+
+            // Escrever como JPG com compressão
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            javax.imageio.ImageWriteParam jpgWriteParam = javax.imageio.ImageIO
+                    .getImageWritersByFormatName("jpg").next().getDefaultWriteParam();
+            jpgWriteParam.setCompressionMode(javax.imageio.ImageWriteParam.MODE_EXPLICIT);
+            jpgWriteParam.setCompressionQuality(0.85f);
+
+            javax.imageio.ImageWriter writer = javax.imageio.ImageIO.getImageWritersByFormatName("jpg").next();
+            writer.setOutput(new javax.imageio.stream.MemoryCacheImageOutputStream(baos));
+            writer.write(null, new javax.imageio.IIOImage(rgbImage, null, null), jpgWriteParam);
+            writer.dispose();
+
+            return baos.toByteArray();
         }
 
         private List<String> validateEventBasic(Event e) {

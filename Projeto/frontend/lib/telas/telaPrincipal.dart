@@ -1,13 +1,34 @@
-// 11. Tela Principal (após login)
+// ==============================================================================
+// TELA PRINCIPAL (DASHBOARD)
+// ==============================================================================
+// Função: Hub central após login - visualização e navegação para funcionalidades
+// 
+// Funcionalidades:
+// - Exibição de eventos disponíveis (busca via API /api/bff/events/search)
+// - Barra de navegação superior com nome do site
+// - Menu do usuário (Avatar com opções):
+//   • Gerenciar Eventos (criar e editar eventos do usuário)
+//   • Editar Perfil
+//   • Logout (limpa token JWT e dados do usuário)
+// - Busca de eventos com preview de resultados
+// - Navegação para tela de criação de evento
+// - Navegação para tela de pesquisa de eventos
+// - Cards de eventos com informações básicas
+// ==============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'auth.dart';
 import 'dart:convert';
 import 'telaPesquisarEvento.dart';
-import 'telaGerenciamentoEvento.dart';
+import 'telaGerenciarEventos.dart'; // ManageEventsScreen
+import 'telaInscricaoEvento.dart'; // EventRegistrationScreen
+import 'telaHomePage.dart'; // HomeScreen & HomePageData
 import 'telaEdicaoPerfil.dart';
 import 'telaCriacaoEvento.dart';
-import 'telaHomePage.dart'; // Para logout
+import 'telaInscricaoEvento.dart'; // Importar tela de inscrição
+import 'telaHomePage.dart'; // Para deslogar
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -26,7 +47,10 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> _fetchEvents() async {
-    final response = await http.get(Uri.parse('http://localhost:8080/bff/events/search?term='));
+  final response = await http.get(
+    Uri.parse('/api/bff/events/search?term='),
+    headers: ApiAuth.jsonHeaders(),
+  );
     if (response.statusCode == 200) {
       setState(() {
         events = jsonDecode(response.body);
@@ -89,6 +113,8 @@ class _MainScreenState extends State<MainScreen> {
                   MaterialPageRoute(builder: (context) => const CreateEventScreen()),
                 );
               } else if (value == 'Deslogar') {
+                // Limpar token ao deslogar
+                ApiAuth.clearToken();
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -142,7 +168,9 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      children: <Widget>[
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
                         Text(
                           event['event_name'],
                           style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
@@ -174,7 +202,8 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                           ],
                         ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

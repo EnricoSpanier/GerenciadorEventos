@@ -17,6 +17,7 @@ public class Event {
     private int quantity;
     private String description;
     private List<String> presenters;    //apresentadores
+    private byte[] image_data;          // imagem em formato JPG
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -33,6 +34,7 @@ public class Event {
         this.quantity = 0;
         this.description = "";
         this.presenters = new ArrayList<>();
+        this.image_data = null;
         this.createdAt = null;
         this.updatedAt = null;
     }
@@ -103,6 +105,10 @@ public class Event {
     public void setDescription(String description) { this.description = description; }
 
     public void setPresenters(List<String> presenters) { this.presenters = presenters; }
+
+    public byte[] getImage_data() { return image_data; }
+
+    public void setImage_data(byte[] image_data) { this.image_data = image_data; }
 
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     

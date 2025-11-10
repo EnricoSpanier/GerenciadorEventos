@@ -3,7 +3,7 @@ name: gerenciador-eventos
 services:
   db:
     build:
-      context: ./db
+      context: ./Backend/db
       dockerfile: Dockerfile
     container_name: gerenciador-db
     env_file:

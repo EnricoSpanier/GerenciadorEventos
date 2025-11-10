@@ -1,5 +1,8 @@
 package com.gerenciador.eventos.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -140,5 +143,37 @@ public class EventService {
                 throw new IllegalArgumentException("Nome de evento já existente: " + e.getEvent_name());
             }
         }
+    }
+
+    public List<Event> searchEvents(String term) {
+        // If no term provided, return all events
+        List<Event> all = eventRepository.findAll();
+        if (term == null || term.isBlank()) {
+            return all;
+        }
+
+        String q = term.toLowerCase();
+        List<Event> result = new ArrayList<>();
+        for (Event e : all) {
+            if (e.getEvent_name() != null && e.getEvent_name().toLowerCase().contains(q)) {
+                result.add(e);
+            }
+        }
+        return result;
+    }
+
+    public List<Event> findByCreatorId(Long creatorId) {
+        if (creatorId == null) {
+            return new ArrayList<>();
+        }
+        
+        List<Event> all = eventRepository.findAll();
+        List<Event> result = new ArrayList<>();
+        for (Event e : all) {
+            if (e.getCreator_id() != null && e.getCreator_id().equals(creatorId)) {
+                result.add(e);
+            }
+        }
+        return result;
     }
 }

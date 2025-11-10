@@ -1,5 +1,8 @@
 -- Table: public.event
 -- Tabela de eventos (depende de users.user_id via FK)
+-- Encoding: UTF-8
+
+SET client_encoding = 'UTF8';
 
 DROP TABLE IF EXISTS public.event CASCADE;
 
@@ -15,6 +18,7 @@ CREATE TABLE IF NOT EXISTS public.event
     capacity integer,
     quant integer NOT NULL,
     description text COLLATE pg_catalog."default" NOT NULL,
+    image_data bytea,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Event_pkey" PRIMARY KEY (event_id),

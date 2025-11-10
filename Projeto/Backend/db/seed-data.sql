@@ -1,7 +1,10 @@
 -- ==========================================
 -- SCRIPT PARA POPULAR TABELAS COM DADOS
 -- Executa INSERTs sem limpar dados existentes
+-- Encoding: UTF-8
 -- ==========================================
+
+SET client_encoding = 'UTF8';
 
 -- Inserir usuários de exemplo
 INSERT INTO users (user_name, email, fone, password, birthdate, admin) VALUES
@@ -22,7 +25,7 @@ INSERT INTO event (creator_id, event_name, ead, address, event_date, buy_time_li
         '2025-12-15 09:00:00',
         '2025-12-14 23:59:59',
         100,
-        100,
+        2,
         'Aprenda Java do zero ao avançado com experts da área'
     ),
     (
@@ -33,7 +36,7 @@ INSERT INTO event (creator_id, event_name, ead, address, event_date, buy_time_li
         '2025-12-20 14:00:00',
         '2025-12-19 23:59:59',
         200,
-        200,
+        3,
         'As melhores práticas de DevOps e Cloud Computing'
     ),
     (
@@ -44,7 +47,7 @@ INSERT INTO event (creator_id, event_name, ead, address, event_date, buy_time_li
         '2026-01-10 08:00:00',
         '2026-01-09 23:59:59',
         50,
-        50,
+        1,
         'Competição de programação com prêmios incríveis'
     ),
     (
@@ -55,7 +58,7 @@ INSERT INTO event (creator_id, event_name, ead, address, event_date, buy_time_li
         '2025-12-01 19:00:00',
         '2025-12-01 18:00:00',
         NULL,
-        500,
+        0,
         'Compartilhe experiências e aprenda sobre Spring Boot'
     ),
     (
@@ -66,7 +69,7 @@ INSERT INTO event (creator_id, event_name, ead, address, event_date, buy_time_li
         '2026-02-05 10:00:00',
         '2026-02-04 23:59:59',
         30,
-        30,
+        0,
         'Containerização e orquestração com Docker e Kubernetes'
     )
 ON CONFLICT (event_name) DO NOTHING;
